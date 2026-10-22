@@ -1,5 +1,5 @@
 # roselock
-A lock screen for people who like glassy interfaces.
+A (cool) macOS inspired lockscreen.
 
 ![roselock screenshot](roselock.png)
 ## requirements
