@@ -145,15 +145,22 @@ Item {
         font.pixelSize: 22 * root.u
         font.weight: Font.DemiBold
       }
-      ShadowText {
-        anchors.horizontalCenter: parent.horizontalCenter
-        text: Qt.formatDateTime(clock.date, Config.use24h ? "HH:mm" : "h:mm")
-        color: Qt.rgba(1, 1, 1, 0.92)
-        font.family: Config.display
-        font.pixelSize: 108 * root.u
-        font.weight: Config.clockWeight
-        font.letterSpacing: -3 * root.u
-      }
+     ShadowText {
+    anchors.horizontalCenter: parent.horizontalCenter
+    text: {
+        if (Config.use24h)
+            return Qt.formatDateTime(clock.date, "HH:mm");
+        var h = clock.date.getHours() % 12;
+        if (h === 0) h = 12;
+        var m = clock.date.getMinutes();
+        return h + ":" + (m < 10 ? "0" + m : m);
+    }
+    color: Qt.rgba(1, 1, 1, 0.92)
+    font.family: Config.display
+    font.pixelSize: 108 * root.u
+    font.weight: Config.clockWeight
+    font.letterSpacing: -3 * root.u
+}
     }
 
     NowPlaying {
