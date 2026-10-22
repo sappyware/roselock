@@ -77,5 +77,5 @@ mode = "screenshot"
 # ms
 fade_ms = 700
 ```
-## ⚠️ you need [https://github.com/sappyware/rosewallpapers](rosewallpapers) for shader mode.
+## ⚠️ you need [rosewallpapers](https://github.com/sappyware/rosewallpapers) for shader mode.
 ## help me fix any bugs with PRs!
