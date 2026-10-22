@@ -22,7 +22,7 @@ ShellRoot {
   LockContext { id: ctx }
 
   FloatingWindow {
-    title: "macoslock preview"
+    title: "roselock preview"
     color: "black"
     implicitWidth: 1920
     implicitHeight: 1080
