@@ -1,31 +1,37 @@
 import QtQuick
+import QtQuick.Effects
 import QtQuick.Shapes
 import Quickshell
 
 Item {
   id: root
 
-  readonly property bool usingShader: Config.wallpaperShaderReady
+  readonly property bool useShader: Config.wallpaperMode === "shader" && Config.wallpaperShaderReady
+  readonly property bool useScreenshot: Config.wallpaperMode === "screenshot_blur"
+    && Config.desktop.toString() !== ""
+  readonly property bool blurActive: useScreenshot && Config.screenshotBlur > 0
 
-  readonly property bool ready: width > 0 && (
-    usingShader
-      || (loader.item !== null
-        && (loader.item.status === Image.Ready || loader.item.status === Image.Error))
-  )
+  readonly property url imageSource: useScreenshot ? Config.desktop : Config.wallpaper
 
   property real shaderTime: 0
   Timer {
-    interval: 33
-    running: root.usingShader
+    interval: Math.round(1000 / Math.max(1, Config.shaderFps))
+    running: root.useShader
     repeat: true
     triggeredOnStart: true
     onTriggered: root.shaderTime += interval / 1000.0
   }
 
+  readonly property bool ready: width > 0 && (
+    useShader
+      || (imgLoader.item !== null
+        && (imgLoader.item.status === Image.Ready || imgLoader.item.status === Image.Error))
+  )
+
   Loader {
     id: shaderLoader
     anchors.fill: parent
-    active: root.usingShader
+    active: root.useShader
     sourceComponent: ShaderEffect {
       anchors.fill: parent
       fragmentShader: Config.wallpaperShaderUrl
@@ -33,10 +39,43 @@ Item {
     }
   }
 
+  Loader {
+    id: imgLoader
+    anchors.fill: parent
+    active: !root.useShader && root.width > 0
+    sourceComponent: Item {
+      id: imgWrap
+      anchors.fill: parent
+      clip: true
+
+      readonly property int pad: Math.ceil(Math.max(0, Config.screenshotBlur) * 96) + 4
+      readonly property int status: img.status
+
+      Image {
+        id: img
+        anchors.fill: parent
+        anchors.margins: root.blurActive ? -imgWrap.pad : 0
+        source: root.imageSource
+        fillMode: Image.PreserveAspectCrop
+        asynchronous: false
+        smooth: true
+        sourceSize.width: Math.min(7680, Math.round(root.width * Screen.devicePixelRatio))
+        layer.enabled: root.blurActive
+        layer.effect: MultiEffect {
+          blurEnabled: true
+          blur: Config.screenshotBlur
+          blurMax: 96
+          autoPaddingEnabled: false
+        }
+      }
+    }
+  }
+
   Item {
     anchors.fill: parent
-    visible: !root.usingShader && root.ready
-      && loader.item && loader.item.status === Image.Error
+    visible: !root.useShader
+      && imgLoader.item !== null
+      && imgLoader.item.status === Image.Error
 
     Rectangle {
       anchors.fill: parent
@@ -77,18 +116,5 @@ Item {
     Blob { cx: 0.18; cy: 0.22; r: 0.55; tone: "#4c7dff"; strength: 0.55 }
     Blob { cx: 0.85; cy: 0.30; r: 0.45; tone: "#ff6fb1"; strength: 0.50 }
     Blob { cx: 0.60; cy: 1.00; r: 0.60; tone: "#ffa46b"; strength: 0.55 }
-  }
-
-  Loader {
-    id: loader
-    anchors.fill: parent
-    active: !root.usingShader && root.width > 0
-    sourceComponent: Image {
-      source: Config.wallpaper
-      fillMode: Image.PreserveAspectCrop
-      asynchronous: false
-      smooth: true
-      sourceSize.width: Math.min(7680, Math.round(root.width * Screen.devicePixelRatio))
-    }
   }
 }

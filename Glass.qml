@@ -47,10 +47,8 @@ Item {
         antialiasing: true
         visible: false
         layer.enabled: true
+        layer.samples: 8
         layer.smooth: true
-        layer.mipmap: true
-        layer.textureSize: Qt.size(Math.max(1, Math.ceil(g.width * Screen.devicePixelRatio * 3)),
-          Math.max(1, Math.ceil(g.height * Screen.devicePixelRatio * 3)))
       }
 
       MultiEffect {
@@ -86,7 +84,7 @@ Item {
     radius: g.radius
     antialiasing: true
     color: "transparent"
-    border.width: 1
-    border.color: Qt.rgba(1, 1, 1, g.borderOpacity)
+    border.width: Math.max(1.5, g.radius > 20 ? 2 : 1.5)
+    border.color: Qt.rgba(1, 1, 1, Math.min(0.55, g.borderOpacity * 1.8))
   }
 }

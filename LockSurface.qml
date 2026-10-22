@@ -98,7 +98,7 @@ Item {
     visible: false
     autoPaddingEnabled: false
     blurEnabled: true
-    blur: 1.0
+    blur: Config.glassBlur
     blurMax: 128
     saturation: 0.35
     brightness: -0.05
@@ -157,12 +157,13 @@ Item {
     }
 
     NowPlaying {
+      id: npWidget
       anchors.horizontalCenter: parent.horizontalCenter
       anchors.top: clockBlock.bottom
       anchors.topMargin: 34 * root.u
       source: blurred
       u: root.u
-      opacity: root.intro * (active ? 1 : 0)
+      opacity: root.intro * (npWidget.active ? 1 : 0)
       Behavior on opacity { NumberAnimation { duration: 300 } }
     }
 
